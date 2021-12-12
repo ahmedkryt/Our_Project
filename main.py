@@ -1,2 +1,1 @@
-hello
-some push
+a = 3
