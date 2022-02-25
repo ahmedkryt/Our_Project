@@ -24,6 +24,13 @@ snake_block = 30
 snake_speed = 5
 
 
+def lvl_1():
+    background = pygame.image.load('Res/bg_lvl1.jpg').convert()
+    background = pygame.transform.smoothscale(background, screen.get_size())
+    screen.blit(background, (0, 0))
+    pygame.display.flip()
+
+
 # функция окончания игры
 def terminate():
     # фон проигрыша
@@ -38,7 +45,7 @@ def terminate():
 
 
 # заставка
-def start_screen(screen):
+def start_screen():
     # фон
     background = pygame.image.load('Res/Re.jpg').convert()
     background = pygame.transform.smoothscale(background, screen.get_size())
@@ -57,9 +64,18 @@ def score(score):
 
 
 # функция рисует змейку
-def snake_draw(snake_block, snake_list):
-    for i in snake_list:
-        pygame.draw.rect(screen, black, [i[0], i[1], snake_block, snake_block])
+def snake_draw(snake_block, snake_list, speed_x, speed_y):
+    if speed_x == -snake_block and speed_y == 0:
+        head = pygame.image.load("Res/head_left.png").convert()
+    if speed_x == snake_block and speed_y == 0:
+        head = pygame.image.load("Res/head_right.png").convert()
+    if speed_y == -snake_block and speed_x == 0:
+        head = pygame.image.load("Res/head_up.png").convert()
+    if (speed_y == snake_block and speed_x == 0) or (speed_x == 0 and speed_y == 0):
+        head = pygame.image.load("Res/head_down.png").convert()
+    print(speed_x, ' ', speed_y)
+    return head
+
 
 
 # обработчик нажатий
@@ -125,7 +141,7 @@ def game():
     apple_y = random.randint(0, height // snake_block) * snake_block
     # основной цикл игры
     while not game_over:
-        screen.fill(white)
+        lvl_1()
         # смена скорости
         speed_x, speed_y = movements_snake(speed_x, speed_y)
         # проверка на выход за игровую зону
@@ -146,16 +162,18 @@ def game():
         snake_list.append(snake_head)
         if len(snake_list) > length:
             del snake_list[0]
-        # создаем прямоугольники головы и яблока
-        head = pygame.Rect(x, y, snake_block, snake_block)
-        apple = pygame.Rect(apple_x, apple_y, snake_block, snake_block)
-        # рисуем яблоко и змейку
-        pygame.draw.rect(screen, green, apple)
-        snake_draw(snake_block, snake_list)
+        apple = pygame.image.load('Res/apple.png').convert()
+        head = snake_draw(snake_block, snake_list, speed_x, speed_y)
+        head_size = head.get_rect(bottomright=(x, y))
+        apple_size = apple.get_rect(bottomright=(apple_x, apple_y))
+        screen.blit(apple, apple_size)
+        screen.blit(head, head_size)
+        pygame.display.update()
+
         # проверяем пересечение с препятствиями или с телом
         game_over = intersection(snake_list, snake_head)
         # проверяем пересечение головы с яблоком
-        if apple.colliderect(head):
+        if apple_size.colliderect(head_size):
             apple_x = random.randint(0, width // snake_block) * snake_block
             apple_y = random.randint(0, height // snake_block) * snake_block
             length += 1
@@ -168,7 +186,8 @@ def game():
 
 
 # запуск
-start_screen(screen)
+start_screen()
 game()
 
 # ДОБАВИТЬ ТРИ УРОВНЯ СО СВОИМ ДИЗАЙНОМ И ПРЕПЯТСТВИЯМИ
+# уравнять размеры яблока и змейки, доделать анимацию туловища и хвоста
