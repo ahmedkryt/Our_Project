@@ -26,6 +26,13 @@ snake_speed = 5
 
 # функция окончания игры
 def terminate():
+    # фон проигрыша
+    background = pygame.image.load('Res/Game over.jpg').convert()
+    background = pygame.transform.smoothscale(background, screen.get_size())
+    screen.blit(background, (0, 0))
+    pygame.display.flip()
+    delay(3000)
+    # выход из программы
     pygame.quit()
     sys.exit()
 
@@ -131,7 +138,6 @@ def game():
         if y < 0:
             y = ((720 - snake_block)//snake_block)*snake_block + snake_block + 1
 
-        # ______________________________________________________________ДОПИСАТЬ ПЕРЕМЕЩЕНИЕ ЗМЕЙКИ ПРИ ВЫХОДЕ ЗА ЭКРАН
         # смена координат
         x += speed_x
         y += speed_y
@@ -166,4 +172,3 @@ start_screen(screen)
 game()
 
 # ДОБАВИТЬ ТРИ УРОВНЯ СО СВОИМ ДИЗАЙНОМ И ПРЕПЯТСТВИЯМИ
-# ДОБАВИТЬ ЗАСТАВКУ В НАЧАЛЕ ИГРЫ
