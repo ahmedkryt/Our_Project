@@ -25,7 +25,7 @@ snake_speed = 5
 
 
 def lvl_1():
-    background = pygame.image.load('Res/bg_lvl1.jpg').convert()
+    background = pygame.image.load('maps/bg_lvl1.jpg').convert()
     background = pygame.transform.smoothscale(background, screen.get_size())
     screen.blit(background, (0, 0))
     pygame.display.flip()
@@ -34,11 +34,14 @@ def lvl_1():
 # функция окончания игры
 def terminate():
     # фон проигрыша
-    background = pygame.image.load('Res/Game over.jpg').convert()
+    background = pygame.image.load('maps/Game over.jpg').convert()
     background = pygame.transform.smoothscale(background, screen.get_size())
     screen.blit(background, (0, 0))
     pygame.display.flip()
-    delay(3000)
+    # музыка
+    pygame.mixer.music.load("gameover.mp3")
+    pygame.mixer.music.play(1)
+    delay(5700)
     # выход из программы
     pygame.quit()
     sys.exit()
@@ -47,12 +50,12 @@ def terminate():
 # заставка
 def start_screen():
     # фон
-    background = pygame.image.load('Res/Re.jpg').convert()
+    background = pygame.image.load('maps/Re.jpg').convert()
     background = pygame.transform.smoothscale(background, screen.get_size())
     screen.blit(background, (0, 0))
     pygame.display.flip()
     # музыка
-    pygame.mixer.music.load("Res/music.mp3")
+    pygame.mixer.music.load("music.mp3")
     pygame.mixer.music.play(-1)
     delay(3000)
 
@@ -66,16 +69,15 @@ def score(score):
 # функция рисует змейку
 def snake_draw(snake_block, snake_list, speed_x, speed_y):
     if speed_x == -snake_block and speed_y == 0:
-        head = pygame.image.load("Res/head_left.png").convert()
+        head = pygame.image.load("maps/head_left.png").convert()
     if speed_x == snake_block and speed_y == 0:
-        head = pygame.image.load("Res/head_right.png").convert()
+        head = pygame.image.load("maps/head_right.png").convert()
     if speed_y == -snake_block and speed_x == 0:
-        head = pygame.image.load("Res/head_up.png").convert()
+        head = pygame.image.load("maps/head_up.png").convert()
     if (speed_y == snake_block and speed_x == 0) or (speed_x == 0 and speed_y == 0):
-        head = pygame.image.load("Res/head_down.png").convert()
+        head = pygame.image.load("maps/head_down.png").convert()
     print(speed_x, ' ', speed_y)
     return head
-
 
 
 # обработчик нажатий
@@ -162,7 +164,7 @@ def game():
         snake_list.append(snake_head)
         if len(snake_list) > length:
             del snake_list[0]
-        apple = pygame.image.load('Res/apple.png').convert()
+        apple = pygame.image.load('maps/apple.png').convert()
         head = snake_draw(snake_block, snake_list, speed_x, speed_y)
         head_size = head.get_rect(bottomright=(x, y))
         apple_size = apple.get_rect(bottomright=(apple_x, apple_y))
