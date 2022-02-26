@@ -25,7 +25,7 @@ snake_speed = 5
 
 
 def lvl_1():
-    background = pygame.image.load('Res/bg_lvl1.jpg').convert()
+    background = pygame.image.load('maps/bg_lvl1.jpg').convert()
     background = pygame.transform.smoothscale(background, screen.get_size())
     screen.blit(background, (0, 0))
     pygame.display.flip()
@@ -34,12 +34,12 @@ def lvl_1():
 # функция окончания игры
 def terminate():
     # фон проигрыша
-    background = pygame.image.load('Res/Game over.jpg').convert()
+    background = pygame.image.load('maps/Game over.jpg').convert()
     background = pygame.transform.smoothscale(background, screen.get_size())
     screen.blit(background, (0, 0))
     pygame.display.flip()
     # музыка
-    pygame.mixer.music.load("Res/gameover.mp3")
+    pygame.mixer.music.load("gameover.mp3")
     pygame.mixer.music.play(1)
     delay(5700)
     # выход из программы
@@ -50,12 +50,12 @@ def terminate():
 # заставка
 def start_screen():
     # фон
-    background = pygame.image.load('Res/Re.jpg').convert()
+    background = pygame.image.load('maps/Re.jpg').convert()
     background = pygame.transform.smoothscale(background, screen.get_size())
     screen.blit(background, (0, 0))
     pygame.display.flip()
     # музыка
-    pygame.mixer.music.load("Res/music.mp3")
+    pygame.mixer.music.load("music.mp3")
     pygame.mixer.music.play(-1)
     delay(3000)
 
@@ -67,76 +67,54 @@ def score(score):
 
 
 # функция рисует змейку
-def snake_draw(snake_block, snake_coords, duration, body_pictures):
-    turn = [pygame.image.load("Res/body_bottomleft.png").convert(),
-            pygame.image.load("Res/body_bottomright.png").convert(),
-            pygame.image.load("Res/body_topleft.png").convert(),
-            pygame.image.load("Res/body_topright.png").convert()]
-    flag = True
-    if duration == 'up':
-        body_pictures.append(pygame.image.load("Res/head_down.png").convert())
-        for i in turn:
-            if i in body_pictures:
-                flag = True
-                break
-        if not flag:
-            for i in range(1, len(snake_coords)-1):
-                body_pictures.append(pygame.image.load("Res/body_horizontal.png").convert())
-            body_pictures.append(pygame.image.load("Res/tail_up.png").convert())
-
-    if duration == 'down':
-        head = pygame.image.load("Res/head_up.png").convert()
-
-    if duration == 'left':
-        head = pygame.image.load("Res/head_left.png").convert()
-
-    if duration == 'right':
-        head = pygame.image.load("Res/head_right.png").convert()
-    return [body_pictures]
+def snake_draw(snake_block, snake_list, speed_x, speed_y):
+    if speed_x == -snake_block and speed_y == 0:
+        head = pygame.image.load("maps/head_left.png").convert()
+    if speed_x == snake_block and speed_y == 0:
+        head = pygame.image.load("maps/head_right.png").convert()
+    if speed_y == -snake_block and speed_x == 0:
+        head = pygame.image.load("maps/head_up.png").convert()
+    if (speed_y == snake_block and speed_x == 0) or (speed_x == 0 and speed_y == 0):
+        head = pygame.image.load("maps/head_down.png").convert()
+    print(speed_x, ' ', speed_y)
+    return head
 
 
 # обработчик нажатий
-def movements_snake(speed_x, speed_y, duration):
+def movements_snake(speed_x, speed_y):
     for event in pygame.event.get():
         if event.type == pygame.KEYDOWN:
             # стрелочки
             if event.key == pygame.K_LEFT and speed_x != snake_block:
                 speed_x = -snake_block
                 speed_y = 0
-                duration = 'left'
             elif event.key == pygame.K_RIGHT and speed_x != -snake_block:
                 speed_x = snake_block
                 speed_y = 0
-                duration = 'right'
             elif event.key == pygame.K_UP and speed_y != snake_block:
                 speed_y = -snake_block
                 speed_x = 0
-                duration = 'up'
             elif event.key == pygame.K_DOWN and speed_y != -snake_block:
                 speed_y = snake_block
                 speed_x = 0
-                duration = 'down'
             # WASD
             elif event.key == pygame.K_w and speed_y != snake_block:
                 speed_y = -snake_block
                 speed_x = 0
-                duration = 'up'
             elif event.key == pygame.K_a and speed_x != snake_block:
                 speed_x = -snake_block
                 speed_y = 0
-                duration = 'left'
             elif event.key == pygame.K_s and speed_y != -snake_block:
                 speed_y = snake_block
                 speed_x = 0
-                duration = 'down'
             elif event.key == pygame.K_d and speed_x != -snake_block:
                 speed_x = snake_block
                 speed_y = 0
-                duration = 'right'
             # выход из программы
             elif event.key == pygame.K_ESCAPE:
-                terminate()
-    return [speed_x, speed_y, duration]
+                pygame.quit()
+                quit()
+    return [speed_x, speed_y]
 
 
 # функция, которая ловит пересечения, ведущие к окончанию игры
@@ -157,11 +135,8 @@ def game():
 
     speed_x = 0
     speed_y = 0
-    duration = 'up'
 
-    snake_coords = []
-    body_rect = []
-    body_pictures = []
+    snake_list = []
     length = 1
 
     apple_x = random.randint(0, width // snake_block) * snake_block
@@ -170,7 +145,7 @@ def game():
     while not game_over:
         lvl_1()
         # смена скорости
-        speed_x, speed_y, duration = movements_snake(speed_x, speed_y, duration)
+        speed_x, speed_y = movements_snake(speed_x, speed_y)
         # проверка на выход за игровую зону
         if x > width:
             x = 0
@@ -186,27 +161,21 @@ def game():
         y += speed_y
         # записываем координаты по спискам
         snake_head = [x, y]
-        snake_coords.append(snake_head)
-        if len(snake_coords) > length:
-            del snake_coords[0]
-
-        apple = pygame.image.load('Res/apple.png').convert()
-
-        body_pictures = snake_draw(snake_block, snake_coords, duration, body_pictures) # ____________________________
-        # ________________________________________________________________________________получился массив, а не список ????
-        for i in range(len(body_pictures)):
-            rect = body_pictures[i].get_rect(bottomright=(snake_coords[i][0], snake_coords[i][1]))
-            body_rect.append(rect)
-            screen.blit(body_pictures[i], rect)
-
+        snake_list.append(snake_head)
+        if len(snake_list) > length:
+            del snake_list[0]
+        apple = pygame.image.load('maps/apple.png').convert()
+        head = snake_draw(snake_block, snake_list, speed_x, speed_y)
+        head_size = head.get_rect(bottomright=(x, y))
         apple_size = apple.get_rect(bottomright=(apple_x, apple_y))
         screen.blit(apple, apple_size)
+        screen.blit(head, head_size)
         pygame.display.update()
 
         # проверяем пересечение с препятствиями или с телом
-        game_over = intersection(snake_coords, snake_head)
+        game_over = intersection(snake_list, snake_head)
         # проверяем пересечение головы с яблоком
-        if apple_size.colliderect(body_rect[0]):
+        if apple_size.colliderect(head_size):
             apple_x = random.randint(0, width // snake_block) * snake_block
             apple_y = random.randint(0, height // snake_block) * snake_block
             length += 1
