@@ -20,7 +20,7 @@ pygame.display.set_caption('Snake xenzia')
 
 clock = pygame.time.Clock()
 
-snake_block = 40
+snake_block = 50
 snake_speed = 5
 
 tile_images = {
@@ -286,8 +286,8 @@ def game():
     # Начальные параметры
     game_over = False
 
-    x = snake_block * 20
-    y = snake_block * 12
+    x = snake_block * 3
+    y = snake_block * 5
 
     speed_x = 0
     speed_y = 0
