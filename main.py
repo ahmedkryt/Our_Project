@@ -21,7 +21,7 @@ pygame.display.set_caption('Snake xenzia')
 clock = pygame.time.Clock()
 
 snake_block = 40
-snake_speed = 1
+snake_speed = 5
 
 tile_images = {
     'wall': pygame.image.load('small_kam_2.png'),
@@ -153,48 +153,48 @@ class Snake:
         return [body_pictures, old_direction]
 
     # обработчик нажатий
-    def movements_snake(self, speed_x, speed_y, duration, old_duration):
+    def movements_snake(self, speed_x, speed_y, direction, old_direction):
+        old_direction = direction
         for event in pygame.event.get():
             if event.type == pygame.KEYDOWN:
-                old_duration = duration
                 # стрелочки
                 if event.key == pygame.K_LEFT and speed_x != snake_block:
                     speed_x = -snake_block
                     speed_y = 0
-                    duration = 'left'
+                    direction = 'left'
                 elif event.key == pygame.K_RIGHT and speed_x != -snake_block:
                     speed_x = snake_block
                     speed_y = 0
-                    duration = 'right'
+                    direction = 'right'
                 elif event.key == pygame.K_UP and speed_y != snake_block:
                     speed_y = -snake_block
                     speed_x = 0
-                    duration = 'up'
+                    direction = 'up'
                 elif event.key == pygame.K_DOWN and speed_y != -snake_block:
                     speed_y = snake_block
                     speed_x = 0
-                    duration = 'down'
+                    direction = 'down'
                 # WASD
                 elif event.key == pygame.K_w and speed_y != snake_block:
                     speed_y = -snake_block
                     speed_x = 0
-                    duration = 'up'
+                    direction = 'up'
                 elif event.key == pygame.K_a and speed_x != snake_block:
                     speed_x = -snake_block
                     speed_y = 0
-                    duration = 'left'
+                    direction = 'left'
                 elif event.key == pygame.K_s and speed_y != -snake_block:
                     speed_y = snake_block
                     speed_x = 0
-                    duration = 'down'
+                    direction = 'down'
                 elif event.key == pygame.K_d and speed_x != -snake_block:
                     speed_x = snake_block
                     speed_y = 0
-                    duration = 'right'
+                    direction = 'right'
                 # выход из программы
                 elif event.key == pygame.K_ESCAPE:
                     terminate()
-        return [speed_x, speed_y, duration, old_duration]
+        return [speed_x, speed_y, direction, old_direction]
 
     # функция, которая ловит пересечения, ведущие к окончанию игры
     def intersection(self, snake_list, snake_head):
@@ -309,25 +309,13 @@ def game():
     apple_y = random.randint(0, height // snake_block) * snake_block
 
     snake = Snake(snake_block, snake_speed)
+    apple = pygame.image.load('Res/apple.png').convert_alpha()
     # основной цикл игры
     while not game_over:
-
-        apple = pygame.image.load('Res/apple.png').convert_alpha()
+        # получаем список с картинками для тела
         body_pictures, old_direction = snake.snake_draw(snake_coords, direction, body_pictures, old_direction)
-        speed_x, speed_y, direction, old_direction = snake.movements_snake(speed_x, speed_y, direction, old_direction)
-        apple_size = apple.get_rect(bottomright=(apple_x, apple_y))
-
-
         # проверяем пересечение с препятствиями или с телом
         game_over = snake.intersection(snake_coords, body_rect[-1])
-
-        # проверяем пересечение головы с яблоком
-        if apple_size.colliderect(body_rect[-1]):
-            apple_x = random.randint(0, width // snake_block) * snake_block
-            apple_y = random.randint(0, height // snake_block) * snake_block
-            length += 1
-        # рисуем счет
-        snake.score(length - 3)
         # проверка на выход за игровую зону
         if x > width:
             x = 0
@@ -337,7 +325,26 @@ def game():
             y = snake_block
         if y < 0:
             y = ((720 - snake_block)//snake_block)*snake_block + snake_block + 1
+
+        apple_size = apple.get_rect(bottomright=(apple_x, apple_y))
+        if apple_size.colliderect(body_rect[-1]):
+            apple_x = random.randint(0, width // snake_block) * snake_block
+            apple_y = random.randint(0, height // snake_block) * snake_block
+            length += 1
+        # рисуем
+        trava_group.draw(screen)
+        kamni_group.draw(screen)
+        snake.score(length - 3)
+        screen.blit(apple, apple_size)
+        for i in reversed(range(len(body_pictures))):
+            rect = body_pictures[i].get_rect(bottomright=(snake_coords[i][0], snake_coords[i][1]))
+            body_rect[i] = rect
+            screen.blit(body_pictures[i], rect)
+        pygame.display.update()
+
         # смена координат
+        # обрабатываем нажатие
+        speed_x, speed_y, direction, old_direction = snake.movements_snake(speed_x, speed_y, direction, old_direction)
         x += speed_x
         y += speed_y
         if speed_x != 0 or speed_y != 0:
@@ -345,18 +352,7 @@ def game():
             snake_head = [x, y]
             snake_coords.append(snake_head)
             del (snake_coords[0])
-            pygame.display.update()
-            clock.tick(snake_speed)
-
-        trava_group.draw(screen)
-        kamni_group.draw(screen)
         clock.tick(snake_speed)
-        screen.blit(apple, apple_size)
-        for i in reversed(range(len(body_pictures))):
-            rect = body_pictures[i].get_rect(bottomright=(snake_coords[i][0], snake_coords[i][1]))
-            body_rect[i] = rect
-            screen.blit(body_pictures[i], rect)
-        pygame.display.update()
 
     # Game over
     terminate()
@@ -366,4 +362,4 @@ def game():
 start_screen()
 game()
 
-# уравнять размеры яблока и змейки, доделать анимацию туловища и хвоста, реализовать переход между уровнями
+# реализовать переход между уровнями, реализовать рост змейки
