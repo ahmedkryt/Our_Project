@@ -21,7 +21,7 @@ pygame.display.set_caption('Snake xenzia')
 clock = pygame.time.Clock()
 
 snake_block = 40
-snake_speed = 5
+snake_speed = 1
 
 tile_images = {
     'wall': pygame.image.load('small_kam_2.png'),
@@ -73,11 +73,6 @@ class Snake:
 
     # функция рисует змейку
     def snake_draw(self, snake_coords, direction, body_pictures, old_direction):
-        turn = [pygame.image.load("Res/body_bottomleft.png").convert_alpha(),
-                pygame.image.load("Res/body_bottomright.png").convert_alpha(),
-                pygame.image.load("Res/body_topleft.png").convert_alpha(),
-                pygame.image.load("Res/body_topright.png").convert_alpha()]
-
         direct = {
             'body_left': ['left-up', 'down-right'],
             'body_right': ['right-up', 'down-left'],
@@ -319,15 +314,9 @@ def game():
 
         apple = pygame.image.load('Res/apple.png').convert_alpha()
         body_pictures, old_direction = snake.snake_draw(snake_coords, direction, body_pictures, old_direction)
-
-        for i in reversed(range(len(body_pictures))):
-            rect = body_pictures[i].get_rect(bottomright=(snake_coords[i][0], snake_coords[i][1]))
-            body_rect[i] = rect
-            screen.blit(body_pictures[i], rect)
-
+        speed_x, speed_y, direction, old_direction = snake.movements_snake(speed_x, speed_y, direction, old_direction)
         apple_size = apple.get_rect(bottomright=(apple_x, apple_y))
-        screen.blit(apple, apple_size)
-        pygame.display.update()
+
 
         # проверяем пересечение с препятствиями или с телом
         game_over = snake.intersection(snake_coords, body_rect[-1])
@@ -339,8 +328,6 @@ def game():
             length += 1
         # рисуем счет
         snake.score(length - 3)
-        # смена скорости
-        speed_x, speed_y, direction, old_direction = snake.movements_snake(speed_x, speed_y, direction, old_direction)
         # проверка на выход за игровую зону
         if x > width:
             x = 0
@@ -361,10 +348,15 @@ def game():
             pygame.display.update()
             clock.tick(snake_speed)
 
-        pygame.display.update()
         trava_group.draw(screen)
         kamni_group.draw(screen)
         clock.tick(snake_speed)
+        screen.blit(apple, apple_size)
+        for i in reversed(range(len(body_pictures))):
+            rect = body_pictures[i].get_rect(bottomright=(snake_coords[i][0], snake_coords[i][1]))
+            body_rect[i] = rect
+            screen.blit(body_pictures[i], rect)
+        pygame.display.update()
 
     # Game over
     terminate()
