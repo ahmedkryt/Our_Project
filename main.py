@@ -259,12 +259,13 @@ def game():
     while not game_over:
 
         apple = pygame.image.load('Res/apple.png').convert()
-
         body_pictures = snake.snake_draw(snake_coords, duration, body_pictures)
+
         for i in reversed(range(len(body_pictures))):
             rect = body_pictures[i].get_rect(bottomright=(snake_coords[i][0], snake_coords[i][1]))
             body_rect[i] = rect
             screen.blit(body_pictures[i], rect)
+
         apple_size = apple.get_rect(bottomright=(apple_x, apple_y))
         screen.blit(apple, apple_size)
         pygame.display.update()
@@ -293,7 +294,7 @@ def game():
         # смена координат
         x += speed_x
         y += speed_y
-        if speed_x != 0 and speed_y != 0:
+        if speed_x != 0 or speed_y != 0:
             # записываем координаты по спискам
             snake_head = [x, y]
             snake_coords.append(snake_head)
