@@ -34,7 +34,7 @@ tile_width = tile_height = 50
 # функция окончания игры
 def terminate():
     # фон проигрыша
-    background = pygame.image.load('Res/Game over.jpg').convert()
+    background = pygame.image.load('Res/Game over.jpg').convert_alpha()
     background = pygame.transform.smoothscale(background, screen.get_size())
     screen.blit(background, (0, 0))
     pygame.display.flip()
@@ -50,7 +50,7 @@ def terminate():
 # заставка
 def start_screen():
     # фон
-    background = pygame.image.load('Res/Re.jpg').convert()
+    background = pygame.image.load('Res/Re.jpg').convert_alpha()
     background = pygame.transform.smoothscale(background, screen.get_size())
     screen.blit(background, (0, 0))
     pygame.display.flip()
@@ -73,30 +73,54 @@ class Snake:
 
     # функция рисует змейку
     def snake_draw(self, snake_coords, duration, body_pictures):
-        turn = [pygame.image.load("Res/body_bottomleft.png").convert(),
-                pygame.image.load("Res/body_bottomright.png").convert(),
-                pygame.image.load("Res/body_topleft.png").convert(),
-                pygame.image.load("Res/body_topright.png").convert()]
+        turn = [pygame.image.load("Res/body_bottomleft.png").convert_alpha(),
+                pygame.image.load("Res/body_bottomright.png").convert_alpha(),
+                pygame.image.load("Res/body_topleft.png").convert_alpha(),
+                pygame.image.load("Res/body_topright.png").convert_alpha()]
         flag = False
         if duration == 'up':
-            pass
-
-        if duration == 'down':
-            body_pictures[-1] = pygame.image.load("Res/head_down.png").convert()
+            body_pictures[-1] = pygame.image.load("Res/head_up.png").convert_alpha()
             for i in turn:
                 if i in body_pictures:
                     flag = True
                     break
             if not flag:
                 for i in reversed(range(1, len(snake_coords) - 1)):
-                    body_pictures[i] = pygame.image.load("Res/body_vertical.png").convert()
-                body_pictures[0] = pygame.image.load("Res/tail_up.png").convert()
+                    body_pictures[i] = pygame.image.load("Res/body_vertical.png").convert_alpha()
+                body_pictures[0] = pygame.image.load("Res/tail_down.png").convert_alpha()
+
+        if duration == 'down':
+            body_pictures[-1] = pygame.image.load("Res/head_down.png").convert_alpha()
+            for i in turn:
+                if i in body_pictures:
+                    flag = True
+                    break
+            if not flag:
+                for i in reversed(range(1, len(snake_coords) - 1)):
+                    body_pictures[i] = pygame.image.load("Res/body_vertical.png").convert_alpha()
+                body_pictures[0] = pygame.image.load("Res/tail_up.png").convert_alpha()
 
         if duration == 'left':
-            pass
+            body_pictures[-1] = pygame.image.load("Res/head_left.png").convert_alpha()
+            for i in turn:
+                if i in body_pictures:
+                    flag = True
+                    break
+            if not flag:
+                for i in reversed(range(1, len(snake_coords) - 1)):
+                    body_pictures[i] = pygame.image.load("Res/body_horizontal.png").convert_alpha()
+                body_pictures[0] = pygame.image.load("Res/tail_right.png").convert_alpha()
 
         if duration == 'right':
-            pass
+            body_pictures[-1] = pygame.image.load("Res/head_right.png").convert_alpha()
+            for i in turn:
+                if i in body_pictures:
+                    flag = True
+                    break
+            if not flag:
+                for i in reversed(range(1, len(snake_coords) - 1)):
+                    body_pictures[i] = pygame.image.load("Res/body_horizontal.png").convert_alpha()
+                body_pictures[0] = pygame.image.load("Res/tail_left.png").convert_alpha()
 
         return body_pictures
 
@@ -242,9 +266,9 @@ def game():
 
     snake_coords = [[x, y-snake_block*2], [x, y-snake_block], [x, y]]
 
-    body_pictures = [pygame.image.load('Res/tail_up.png').convert(),
-                     pygame.image.load('Res/body_vertical.png').convert(),
-                     pygame.image.load('Res/head_down.png').convert()]
+    body_pictures = [pygame.image.load('Res/tail_up.png').convert_alpha(),
+                     pygame.image.load('Res/body_vertical.png').convert_alpha(),
+                     pygame.image.load('Res/head_down.png').convert_alpha()]
 
     body_rect = [body_pictures[0].get_rect(bottomright=(snake_coords[0][0], snake_coords[1][1])),
                  body_pictures[1].get_rect(bottomright=(snake_coords[0][0], snake_coords[1][1])),
@@ -258,7 +282,7 @@ def game():
     # основной цикл игры
     while not game_over:
 
-        apple = pygame.image.load('Res/apple.png').convert()
+        apple = pygame.image.load('Res/apple.png').convert_alpha()
         body_pictures = snake.snake_draw(snake_coords, duration, body_pictures)
 
         for i in reversed(range(len(body_pictures))):
