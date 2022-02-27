@@ -72,7 +72,7 @@ class Snake:
         screen.blit(value, [0, 0])
 
     # функция рисует змейку
-    def snake_draw(self, snake_block, snake_coords, duration, body_pictures):
+    def snake_draw(self, snake_coords, duration, body_pictures):
         turn = [pygame.image.load("Res/body_bottomleft.png").convert(),
                 pygame.image.load("Res/body_bottomright.png").convert(),
                 pygame.image.load("Res/body_topleft.png").convert(),
@@ -80,6 +80,7 @@ class Snake:
         flag = False
         if duration == 'up':
             pass
+
         if duration == 'down':
             body_pictures[-1] = pygame.image.load("Res/head_down.png").convert()
             for i in turn:
@@ -92,10 +93,10 @@ class Snake:
                 body_pictures[0] = pygame.image.load("Res/tail_up.png").convert()
 
         if duration == 'left':
-            head = pygame.image.load("Res/head_left.png").convert()
+            pass
 
         if duration == 'right':
-            head = pygame.image.load("Res/head_right.png").convert()
+            pass
 
         return body_pictures
 
@@ -147,7 +148,10 @@ class Snake:
         for i in snake_list[:-1]:
             if i == snake_head:
                 return True
-        # ______________________________________________________________ ДОПИСАТЬ ПЕРЕСЕЧЕНИЕ С ПРЕПЯТСТВИЯМИ НА УРОВНЕ
+
+        for i in kamni_group:
+            if snake_head.colliderect(i):
+                return True
 
 
 class ScreenFrame(pygame.sprite.Sprite):
@@ -174,6 +178,7 @@ class Sprite(pygame.sprite.Sprite):
         pass
 
 
+# Спрайты фона
 class Trava(Sprite):
     def __init__(self, tile_type, pos_x, pos_y):
         super().__init__(trava_group)
@@ -182,6 +187,7 @@ class Trava(Sprite):
             tile_width * pos_x, tile_height * pos_y)
 
 
+# Спрайты препятствий
 class Kamni(Sprite):
     def __init__(self, tile_type, pos_x, pos_y):
         super().__init__(kamni_group)
@@ -190,13 +196,11 @@ class Kamni(Sprite):
             tile_width * pos_x, tile_height * pos_y)
 
 
-player = None
-running = True
 trava_group = SpriteGroup()
 kamni_group = SpriteGroup()
-hero_group = SpriteGroup()
 
 
+# подготовавливаем файл уровня
 def load_level(filename):
     # читаем уровень, убирая символы перевода строки
     with open(filename, 'r') as mapFile:
@@ -256,7 +260,7 @@ def game():
 
         apple = pygame.image.load('Res/apple.png').convert()
 
-        body_pictures = snake.snake_draw(snake_block, snake_coords, duration, body_pictures)
+        body_pictures = snake.snake_draw(snake_coords, duration, body_pictures)
         for i in reversed(range(len(body_pictures))):
             rect = body_pictures[i].get_rect(bottomright=(snake_coords[i][0], snake_coords[i][1]))
             body_rect[i] = rect
@@ -266,7 +270,8 @@ def game():
         pygame.display.update()
 
         # проверяем пересечение с препятствиями или с телом
-        #game_over = intersection(snake_coords, snake_head)
+        game_over = snake.intersection(snake_coords, body_rect[-1])
+
         # проверяем пересечение головы с яблоком
         if apple_size.colliderect(body_rect[-1]):
             apple_x = random.randint(0, width // snake_block) * snake_block
@@ -295,9 +300,7 @@ def game():
             del (snake_coords[0])
             pygame.display.update()
             clock.tick(snake_speed)
-        for i in kamni_group:
-            if body_rect[-1].colliderect(i):
-                game_over = True
+
         pygame.display.update()
         trava_group.draw(screen)
         kamni_group.draw(screen)
@@ -311,4 +314,4 @@ def game():
 start_screen()
 game()
 
-# уравнять размеры яблока и змейки, доделать анимацию туловища и хвоста
+# уравнять размеры яблока и змейки, доделать анимацию туловища и хвоста, реализовать переход между уровнями
