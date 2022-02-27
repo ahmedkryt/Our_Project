@@ -41,7 +41,7 @@ def terminate():
     # музыка
     pygame.mixer.music.load("Res/gameover.mp3")
     pygame.mixer.music.play(1)
-    delay(300)
+    delay(5700)
     # выход из программы
     pygame.quit()
     sys.exit()
