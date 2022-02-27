@@ -79,8 +79,10 @@ class Snake:
                 pygame.image.load("Res/body_topright.png").convert_alpha()]
 
         direct = {
-            'body_left': ['left-down', 'down-right', 'right-up', 'up-left'],
-            'body_right': ['left-up', 'up-right', 'right-down', 'down-left']
+            'body_left': ['right-down', 'up-left'],
+            'body_right': ['up-right', 'left-down'],
+            'top_left': ['right-up', 'down-right'],
+            'top_right': ['left-up', 'down-left']
         }
 
         flag = False
@@ -89,10 +91,15 @@ class Snake:
                 body_pictures[-2] = pygame.image.load("Res/body_bottomleft.png").convert_alpha()
             if (direction + '-' + old_direction) in direct['body_right']:
                 body_pictures[-2] = pygame.image.load("Res/body_bottomright.png").convert_alpha()
+            if (direction + '-' + old_direction) in direct['top_left']:
+                body_pictures[-2] = pygame.image.load("Res/body_topleft.png").convert_alpha()
+            if (direction + '-' + old_direction) in direct['top_right']:
+                body_pictures[-2] = pygame.image.load("Res/body_topright.png").convert_alpha()
         for i in turn:
             if i in body_pictures:
                 flag = True
                 break
+        print(flag)
 
         if direction == 'up':
             body_pictures[-1] = pygame.image.load("Res/head_up.png").convert_alpha()
