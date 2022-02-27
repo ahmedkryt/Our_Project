@@ -72,62 +72,76 @@ class Snake:
         screen.blit(value, [0, 0])
 
     # функция рисует змейку
-    def snake_draw(self, snake_coords, duration, body_pictures):
+    def snake_draw(self, snake_coords, direction, body_pictures, old_direction):
         turn = [pygame.image.load("Res/body_bottomleft.png").convert_alpha(),
                 pygame.image.load("Res/body_bottomright.png").convert_alpha(),
                 pygame.image.load("Res/body_topleft.png").convert_alpha(),
                 pygame.image.load("Res/body_topright.png").convert_alpha()]
+
+        direct = {
+            'body_left': ['left-down', 'down-right', 'right-up', 'up-left'],
+            'body_right': ['left-up', 'up-right', 'right-down', 'down-left']
+        }
+
         flag = False
-        if duration == 'up':
+        if direction != old_direction:
+            if (direction + '-' + old_direction) in direct['body_left']:
+                body_pictures[-2] = pygame.image.load("Res/body_bottomleft.png").convert_alpha()
+            if (direction + '-' + old_direction) in direct['body_right']:
+                body_pictures[-2] = pygame.image.load("Res/body_bottomright.png").convert_alpha()
+        for i in turn:
+            if i in body_pictures:
+                flag = True
+                break
+
+        if direction == 'up':
             body_pictures[-1] = pygame.image.load("Res/head_up.png").convert_alpha()
-            for i in turn:
-                if i in body_pictures:
-                    flag = True
-                    break
             if not flag:
                 for i in reversed(range(1, len(snake_coords) - 1)):
                     body_pictures[i] = pygame.image.load("Res/body_vertical.png").convert_alpha()
-                body_pictures[0] = pygame.image.load("Res/tail_down.png").convert_alpha()
+            else:
+                for i in reversed(range(2, len(snake_coords) - 1)):
+                    body_pictures[i] = pygame.image.load("Res/body_vertical.png").convert_alpha()
+            body_pictures[0] = pygame.image.load("Res/tail_down.png").convert_alpha()
 
-        if duration == 'down':
+        if direction == 'down':
             body_pictures[-1] = pygame.image.load("Res/head_down.png").convert_alpha()
-            for i in turn:
-                if i in body_pictures:
-                    flag = True
-                    break
             if not flag:
                 for i in reversed(range(1, len(snake_coords) - 1)):
                     body_pictures[i] = pygame.image.load("Res/body_vertical.png").convert_alpha()
-                body_pictures[0] = pygame.image.load("Res/tail_up.png").convert_alpha()
+            else:
+                for i in reversed(range(2, len(snake_coords) - 1)):
+                    body_pictures[i] = pygame.image.load("Res/body_vertical.png").convert_alpha()
+            body_pictures[0] = pygame.image.load("Res/tail_up.png").convert_alpha()
 
-        if duration == 'left':
+        if direction == 'left':
             body_pictures[-1] = pygame.image.load("Res/head_left.png").convert_alpha()
-            for i in turn:
-                if i in body_pictures:
-                    flag = True
-                    break
             if not flag:
                 for i in reversed(range(1, len(snake_coords) - 1)):
                     body_pictures[i] = pygame.image.load("Res/body_horizontal.png").convert_alpha()
                 body_pictures[0] = pygame.image.load("Res/tail_right.png").convert_alpha()
+            else:
+                for i in reversed(range(2, len(snake_coords) - 1)):
+                    body_pictures[i] = pygame.image.load("Res/body_horizontal.png").convert_alpha()
+            body_pictures[0] = pygame.image.load("Res/tail_right.png").convert_alpha()
 
-        if duration == 'right':
+        if direction == 'right':
             body_pictures[-1] = pygame.image.load("Res/head_right.png").convert_alpha()
-            for i in turn:
-                if i in body_pictures:
-                    flag = True
-                    break
             if not flag:
                 for i in reversed(range(1, len(snake_coords) - 1)):
                     body_pictures[i] = pygame.image.load("Res/body_horizontal.png").convert_alpha()
-                body_pictures[0] = pygame.image.load("Res/tail_left.png").convert_alpha()
+            else:
+                for i in reversed(range(2, len(snake_coords) - 1)):
+                    body_pictures[i] = pygame.image.load("Res/body_horizontal.png").convert_alpha()
+            body_pictures[0] = pygame.image.load("Res/tail_left.png").convert_alpha()
 
         return body_pictures
 
     # обработчик нажатий
-    def movements_snake(self, speed_x, speed_y, duration):
+    def movements_snake(self, speed_x, speed_y, duration, old_duration):
         for event in pygame.event.get():
             if event.type == pygame.KEYDOWN:
+                old_duration = duration
                 # стрелочки
                 if event.key == pygame.K_LEFT and speed_x != snake_block:
                     speed_x = -snake_block
@@ -165,7 +179,7 @@ class Snake:
                 # выход из программы
                 elif event.key == pygame.K_ESCAPE:
                     terminate()
-        return [speed_x, speed_y, duration]
+        return [speed_x, speed_y, duration, old_duration]
 
     # функция, которая ловит пересечения, ведущие к окончанию игры
     def intersection(self, snake_list, snake_head):
@@ -263,6 +277,7 @@ def game():
     speed_x = 0
     speed_y = 0
     duration = 'down'
+    old_duration = duration
 
     snake_coords = [[x, y-snake_block*2], [x, y-snake_block], [x, y]]
 
@@ -283,7 +298,7 @@ def game():
     while not game_over:
 
         apple = pygame.image.load('Res/apple.png').convert_alpha()
-        body_pictures = snake.snake_draw(snake_coords, duration, body_pictures)
+        body_pictures = snake.snake_draw(snake_coords, duration, body_pictures, old_duration)
 
         for i in reversed(range(len(body_pictures))):
             rect = body_pictures[i].get_rect(bottomright=(snake_coords[i][0], snake_coords[i][1]))
@@ -305,7 +320,7 @@ def game():
         # рисуем счет
         snake.score(length - 3)
         # смена скорости
-        speed_x, speed_y, duration = snake.movements_snake(speed_x, speed_y, duration)
+        speed_x, speed_y, duration, old_duration = snake.movements_snake(speed_x, speed_y, duration, old_duration)
         # проверка на выход за игровую зону
         if x > width:
             x = 0
