@@ -21,7 +21,7 @@ pygame.display.set_caption('Snake xenzia')
 clock = pygame.time.Clock()
 
 snake_block = 50
-snake_speed = 5
+FPS = 5
 
 tile_images = {
     'wall': pygame.image.load('small_kam_2.png'),
@@ -62,9 +62,8 @@ def start_screen():
 
 # класс змейки
 class Snake:
-    def __init__(self, b, s):
+    def __init__(self, b):
         self.snake_block = b
-        self.snake_speed = s
 
     # функция рисует счет
     def score(self, score):
@@ -208,20 +207,6 @@ class Snake:
         return False
 
 
-
-
-
-
-
-
-
-
-class ScreenFrame(pygame.sprite.Sprite):
-    def __init__(self):
-        super().__init__()
-        self.rect = (0, 0, 500, 500)
-
-
 class SpriteGroup(pygame.sprite.Group):
     def __init__(self):
         super().__init__()
@@ -244,6 +229,7 @@ class Sprite(pygame.sprite.Sprite):
 class Trava(Sprite):
     def __init__(self, tile_type, pos_x, pos_y):
         super().__init__(trava_group)
+        screen.fill(white)
         self.image = tile_images[tile_type]
         self.rect = self.image.get_rect().move(
             tile_width * pos_x, tile_height * pos_y)
@@ -253,6 +239,7 @@ class Trava(Sprite):
 class Kamni(Sprite):
     def __init__(self, tile_type, pos_x, pos_y):
         super().__init__(kamni_group)
+        screen.fill(white)
         self.image = tile_images[tile_type]
         self.rect = self.image.get_rect().move(
             tile_width * pos_x, tile_height * pos_y)
@@ -260,16 +247,6 @@ class Kamni(Sprite):
 
 trava_group = SpriteGroup()
 kamni_group = SpriteGroup()
-
-
-
-
-
-
-
-
-
-
 
 
 # подготовавливаем файл уровня
@@ -286,14 +263,12 @@ def load_level(filename):
 
 
 def generate_level(level):
-    new_player, x, y = None, None, None
     for y in range(len(level)):
         for x in range(len(level[y])):
             if level[y][x] == '.':
                 Trava('empty', x, y)
             elif level[y][x] == '#':
                 Kamni('wall', x, y)
-    return new_player, x, y
 
 
 # главная функция
@@ -319,7 +294,7 @@ def game():
                  body_pictures[1].get_rect(bottomright=(snake_coords[1][0], snake_coords[1][1])),
                  body_pictures[2].get_rect(bottomright=(snake_coords[2][0], snake_coords[2][1]))]
     length = 3
-    snake = Snake(snake_block, snake_speed)
+    snake = Snake(snake_block)
     apple_x = random.randint(1, width//snake_block) * snake_block
     apple_y = random.randint(1, height//snake_block) * snake_block
     apple = pygame.image.load('Res/apple.png').convert_alpha()
@@ -333,7 +308,7 @@ def game():
         # получаем список с картинками для тела
         body_pictures, old_direction = snake.snake_draw(snake_coords, direction, body_pictures, old_direction)
         # проверяем пересечение с препятствиями или с телом
-        game_over = snake.intersection(body_rect, body_rect[-1])
+        #game_over = snake.intersection(body_rect, body_rect[-1])
         # проверка на выход за игровую зону
         if x > width:
             x = 0
@@ -349,24 +324,25 @@ def game():
             apple_x = random.randint(1, width // snake_block) * snake_block
             apple_y = random.randint(1, height // snake_block) * snake_block
             length += 1
+            if lvl == 2:
+                screen.fill(white)
+                pygame.display.update()
+                level_map = load_level("map1.txt")
+                generate_level(level_map)
+            elif lvl == 3:
+                screen.fill(white)
+                pygame.display.update()
+                level_map = load_level("map3.txt")
+                generate_level(level_map)
         while snake.intersection(body_rect, apple_size) is True:
             apple_x = random.randint(1, width // snake_block) * snake_block
             apple_y = random.randint(1, height // snake_block) * snake_block
             apple_size = apple.get_rect(bottomright=(apple_x, apple_y))
         # рисуем
-        if 40 > length >= 20:
+        if 40 > length >= 4:
             lvl = 2
-        if length > 40:
+        if length > 6:
             lvl = 3
-        if lvl == 2:
-            level_map = load_level("map2.txt")
-            generate_level(level_map)
-        elif lvl == 3:
-            level_map = load_level("map3.txt")
-            generate_level(level_map)
-        else:
-            level_map = load_level("map1.txt")
-            generate_level(level_map)
 
         trava_group.draw(screen)
         kamni_group.draw(screen)
@@ -388,7 +364,7 @@ def game():
             snake_head = [x, y]
             snake_coords.append(snake_head)
             del (snake_coords[0])
-        clock.tick(snake_speed)
+        clock.tick(FPS)
 
     # Game over
     terminate()
@@ -398,4 +374,4 @@ def game():
 start_screen()
 game()
 
-# реализовать переход между уровнями, реализовать рост змейки
+# реализовать переход между уровнями, реализовать рост змейки, подогнать размер картинок
