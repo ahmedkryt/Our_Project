@@ -208,6 +208,14 @@ class Snake:
         return False
 
 
+
+
+
+
+
+
+
+
 class ScreenFrame(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__()
@@ -254,6 +262,16 @@ trava_group = SpriteGroup()
 kamni_group = SpriteGroup()
 
 
+
+
+
+
+
+
+
+
+
+
 # подготовавливаем файл уровня
 def load_level(filename):
     # читаем уровень, убирая символы перевода строки
@@ -276,10 +294,6 @@ def generate_level(level):
             elif level[y][x] == '#':
                 Kamni('wall', x, y)
     return new_player, x, y
-
-
-level_map = load_level("map1.txt")
-hero, max_x, max_y = generate_level(level_map)
 
 
 # главная функция
@@ -306,13 +320,13 @@ def game():
                  body_pictures[2].get_rect(bottomright=(snake_coords[2][0], snake_coords[2][1]))]
     length = 3
     snake = Snake(snake_block, snake_speed)
-    apple_x = random.randint(1, 20) * snake_block
-    apple_y = random.randint(1, 13) * snake_block
+    apple_x = random.randint(1, width//snake_block) * snake_block
+    apple_y = random.randint(1, height//snake_block) * snake_block
     apple = pygame.image.load('Res/apple.png').convert_alpha()
     apple_size = apple.get_rect(bottomright=(apple_x, apple_y))
     while snake.intersection(body_rect, apple_size) is True:
-        apple_x = random.randint(1, 20) * snake_block
-        apple_y = random.randint(1, 13) * snake_block
+        apple_x = random.randint(1, width // snake_block) * snake_block
+        apple_y = random.randint(1, height // snake_block) * snake_block
         apple_size = apple.get_rect(bottomright=(apple_x, apple_y))
     # основной цикл игры
     while not game_over:
@@ -332,13 +346,13 @@ def game():
 
         apple_size = apple.get_rect(bottomright=(apple_x, apple_y))
         if apple_size.colliderect(body_rect[-1]):
-            apple_x = random.randint(1, 20) * snake_block
-            apple_y = random.randint(1, 13) * snake_block
-            while snake.intersection(body_rect, apple_size) is True:
-                apple_x = random.randint(1, 20) * snake_block
-                apple_y = random.randint(1, 13) * snake_block
-                apple_size = apple.get_rect(bottomright=(apple_x, apple_y))
+            apple_x = random.randint(1, width // snake_block) * snake_block
+            apple_y = random.randint(1, height // snake_block) * snake_block
             length += 1
+        while snake.intersection(body_rect, apple_size) is True:
+            apple_x = random.randint(1, width // snake_block) * snake_block
+            apple_y = random.randint(1, height // snake_block) * snake_block
+            apple_size = apple.get_rect(bottomright=(apple_x, apple_y))
         # рисуем
         if 40 > length >= 20:
             lvl = 2
@@ -349,6 +363,9 @@ def game():
             generate_level(level_map)
         elif lvl == 3:
             level_map = load_level("map3.txt")
+            generate_level(level_map)
+        else:
+            level_map = load_level("map1.txt")
             generate_level(level_map)
 
         trava_group.draw(screen)
