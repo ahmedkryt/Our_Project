@@ -271,6 +271,9 @@ def generate_level(level):
                 Kamni('wall', x, y)
 
 
+level_map = load_level("map1.txt")
+generate_level(level_map)
+
 # главная функция
 def game():
     # Начальные параметры
@@ -325,13 +328,13 @@ def game():
             apple_y = random.randint(1, height // snake_block) * snake_block
             length += 1
             if lvl == 2:
-                screen.fill(white)
-                pygame.display.update()
-                level_map = load_level("map1.txt")
+                trava_group.empty()
+                kamni_group.empty()
+                level_map = load_level("map2.txt")
                 generate_level(level_map)
             elif lvl == 3:
-                screen.fill(white)
-                pygame.display.update()
+                trava_group.empty()
+                kamni_group.empty()
                 level_map = load_level("map3.txt")
                 generate_level(level_map)
         while snake.intersection(body_rect, apple_size) is True:
@@ -339,9 +342,9 @@ def game():
             apple_y = random.randint(1, height // snake_block) * snake_block
             apple_size = apple.get_rect(bottomright=(apple_x, apple_y))
         # рисуем
-        if 40 > length >= 4:
+        if 40 > length >= 20:
             lvl = 2
-        if length > 6:
+        if length > 40:
             lvl = 3
 
         trava_group.draw(screen)
