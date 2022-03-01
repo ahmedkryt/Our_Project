@@ -280,14 +280,45 @@ level_map = load_level("map1.txt")
 generate_level(level_map)
 
 
+def start(x, y, FPS, speed_x, speed_y, direction, old_direction, snake_coords, body_pictures, body_rect, apple_x,
+          apple_y, apple, apple_size, snake):
+    x = snake_block * 3
+    y = snake_block * 9
+    FPS = 5
+    speed_x = 0
+    speed_y = 0
+    direction = 'down'
+    old_direction = direction
+    snake_coords = [[x, y - snake_block * 2], [x, y - snake_block], [x, y]]
+
+    body_pictures = [pygame.image.load('Res/tail_up.png').convert_alpha(),
+                     pygame.image.load('Res/body_vertical.png').convert_alpha(),
+                     pygame.image.load('Res/head_down.png').convert_alpha()]
+
+    body_rect = [body_pictures[0].get_rect(bottomright=(snake_coords[0][0], snake_coords[0][1])),
+                 body_pictures[1].get_rect(bottomright=(snake_coords[1][0], snake_coords[1][1])),
+                 body_pictures[2].get_rect(bottomright=(snake_coords[2][0], snake_coords[2][1]))]
+    apple_x = random.randint(1, width // snake_block) * snake_block
+    apple_y = random.randint(1, height // snake_block) * snake_block
+    apple = pygame.image.load('Res/apple.png').convert_alpha()
+    apple_size = apple.get_rect(bottomright=(apple_x, apple_y))
+    while snake.intersection(body_rect, apple_size) is True:
+        apple_x = random.randint(1, width // snake_block) * snake_block
+        apple_y = random.randint(1, height // snake_block) * snake_block
+        apple_size = apple.get_rect(bottomright=(apple_x, apple_y))
+    return [x, y, FPS, speed_x, speed_y, direction, old_direction, snake_coords, body_pictures, body_rect, apple_x,
+          apple_y, apple, apple_size, snake]
+
+
 # главная функция
 def game():
     # Начальные параметры
     game_over = False
     lvl = 1
     FPS = 5
-    x = snake_block * 5
-    y = snake_block * 6
+    flag = 1
+    x = snake_block * 3
+    y = snake_block * 9
 
     speed_x = 0
     speed_y = 0
@@ -318,7 +349,7 @@ def game():
         # получаем список с картинками для тела
         body_pictures, old_direction = snake.snake_draw(snake_coords, direction, body_pictures, old_direction)
         # проверяем пересечение с препятствиями или с телом
-        #game_over = snake.intersection(body_rect, body_rect[-1])
+        game_over = snake.intersection(body_rect, body_rect[-1])
         # проверка на выход за игровую зону
         if x > width:
             x = 0
@@ -334,24 +365,37 @@ def game():
             apple_x = random.randint(1, width // snake_block) * snake_block
             apple_y = random.randint(1, height // snake_block) * snake_block
             length += 1
-            if lvl == 2:
+            if lvl == 2 and flag != 2:
+                flag = 2
                 trava_group.empty()
                 kamni_group.empty()
                 level_map = load_level("map2.txt")
                 generate_level(level_map)
-            elif lvl == 3:
+                x, y, FPS, speed_x, speed_y, direction, old_direction, \
+                        snake_coords, body_pictures, body_rect, apple_x,  \
+                                    apple_y, apple, apple_size, snake = start(x, y, FPS, speed_x, speed_y,
+                                            direction, old_direction, snake_coords, body_pictures, body_rect, apple_x,
+                                                          apple_y, apple, apple_size, snake)
+            elif lvl == 3 and flag != 3:
+                flag = 3
                 trava_group.empty()
                 kamni_group.empty()
                 level_map = load_level("map3.txt")
                 generate_level(level_map)
+                x, y, FPS, speed_x, speed_y, direction, old_direction, \
+                        snake_coords, body_pictures, body_rect, apple_x, \
+                                    apple_y, apple, apple_size, snake = start(x, y, FPS, speed_x, speed_y,
+                                            direction, old_direction, snake_coords, body_pictures, body_rect, apple_x,
+                                                          apple_y, apple, apple_size, snake)
+            pygame.display.update()
         while snake.intersection(body_rect, apple_size) is True:
             apple_x = random.randint(1, width // snake_block) * snake_block
             apple_y = random.randint(1, height // snake_block) * snake_block
             apple_size = apple.get_rect(bottomright=(apple_x, apple_y))
         # рисуем
-        if 40 > length >= 20:
+        if 40 > length >= 2:
             lvl = 2
-        if length > 40:
+        if length > 8:
             lvl = 3
 
         trava_group.draw(screen)
@@ -383,5 +427,3 @@ def game():
 # запуск
 start_screen()
 game()
-
-# реализовать переход между уровнями, реализовать рост змейки, подогнать размер картинок
