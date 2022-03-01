@@ -408,7 +408,6 @@ def game():
             screen.blit(body_pictures[i], rect)
         pygame.display.update()
 
-        # смена координат
         # обрабатываем нажатие
         speed_x, speed_y, direction, old_direction, FPS = snake.movements_snake(speed_x, speed_y, direction, old_direction, FPS)
         x += speed_x
