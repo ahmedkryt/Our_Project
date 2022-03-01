@@ -351,14 +351,16 @@ def game():
         # проверяем пересечение с препятствиями или с телом
         game_over = snake.intersection(body_rect, body_rect[-1])
         # проверка на выход за игровую зону
-        if x > width:
-            x = 0
-        if x < 0:
-            x = ((width - snake_block) // snake_block) * snake_block
-        if y > height:
-            y = snake_block
-        if y < 0:
-            y = ((720 - snake_block)//snake_block)*snake_block + snake_block + 1
+        # проверка на выход за игровую зону
+        if x >= width or x < 0 or y >= height or y < 0:
+            if x >= width:
+                x = -15
+            elif x <= 0:
+                x = width + 49
+            if y >= height:
+                y = -15
+            elif y <= 0:
+                y = height + 49
 
         apple_size = apple.get_rect(bottomright=(apple_x, apple_y))
         if apple_size.colliderect(body_rect[-1]):
@@ -393,9 +395,9 @@ def game():
             apple_y = random.randint(1, height // snake_block) * snake_block
             apple_size = apple.get_rect(bottomright=(apple_x, apple_y))
         # рисуем
-        if 40 > length >= 2:
+        if 40 > length >= 20:
             lvl = 2
-        if length > 8:
+        if length > 40:
             lvl = 3
 
         trava_group.draw(screen)
