@@ -21,7 +21,6 @@ pygame.display.set_caption('Snake xenzia')
 clock = pygame.time.Clock()
 
 snake_block = 50
-FPS = 5
 
 tile_images = {
     'wall': pygame.image.load('small_kam_2.png'),
@@ -152,7 +151,7 @@ class Snake:
         return [body_pictures, old_direction]
 
     # обработчик нажатий
-    def movements_snake(self, speed_x, speed_y, direction, old_direction):
+    def movements_snake(self, speed_x, speed_y, direction, old_direction, FPS):
         old_direction = direction
         for event in pygame.event.get():
             if event.type == pygame.KEYDOWN:
@@ -193,7 +192,13 @@ class Snake:
                 # выход из программы
                 elif event.key == pygame.K_ESCAPE:
                     terminate()
-        return [speed_x, speed_y, direction, old_direction]
+                elif event.key == pygame.K_1 and FPS == 10:
+                    FPS = 5
+                elif event.key == pygame.K_2:
+                    FPS = 10
+                elif event.key == pygame.K_3 and FPS == 10:
+                    FPS = 15
+        return [speed_x, speed_y, direction, old_direction, FPS]
 
     # функция, которая ловит пересечения, ведущие к окончанию игры
     def intersection(self, body, snake_or_apple):
@@ -274,11 +279,13 @@ def generate_level(level):
 level_map = load_level("map1.txt")
 generate_level(level_map)
 
+
 # главная функция
 def game():
     # Начальные параметры
     game_over = False
     lvl = 1
+    FPS = 5
     x = snake_block * 5
     y = snake_block * 6
 
@@ -296,7 +303,7 @@ def game():
     body_rect = [body_pictures[0].get_rect(bottomright=(snake_coords[0][0], snake_coords[0][1])),
                  body_pictures[1].get_rect(bottomright=(snake_coords[1][0], snake_coords[1][1])),
                  body_pictures[2].get_rect(bottomright=(snake_coords[2][0], snake_coords[2][1]))]
-    length = 3
+    length = 0
     snake = Snake(snake_block)
     apple_x = random.randint(1, width//snake_block) * snake_block
     apple_y = random.randint(1, height//snake_block) * snake_block
@@ -349,7 +356,7 @@ def game():
 
         trava_group.draw(screen)
         kamni_group.draw(screen)
-        snake.score(length - 3)
+        snake.score(length)
         screen.blit(apple, apple_size)
         for i in reversed(range(len(body_pictures))):
             rect = body_pictures[i].get_rect(bottomright=(snake_coords[i][0], snake_coords[i][1]))
@@ -359,7 +366,7 @@ def game():
 
         # смена координат
         # обрабатываем нажатие
-        speed_x, speed_y, direction, old_direction = snake.movements_snake(speed_x, speed_y, direction, old_direction)
+        speed_x, speed_y, direction, old_direction, FPS = snake.movements_snake(speed_x, speed_y, direction, old_direction, FPS)
         x += speed_x
         y += speed_y
         if speed_x != 0 or speed_y != 0:
